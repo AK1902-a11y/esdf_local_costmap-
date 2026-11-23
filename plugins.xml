@@ -1,0 +1,7 @@
+<class_libraries>
+  <library path="nav2_esdf_layer">
+    <class type="nav2_esdf::EsdfLayer" base_class_type="nav2_costmap_2d::Layer">
+      <description>Read-only costmap layer that maintains a rolling-window incremental Euclidean distance field of the lethal cells (put it last in the plugin list).</description>
+    </class>
+  </library>
+</class_libraries>

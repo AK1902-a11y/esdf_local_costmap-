@@ -161,7 +161,17 @@ void EsdfLayer::updateCosts(
     }
     // (b) which kept cells flipped?
     auto t1 = Clock::now();
-    t.changed = field_->syncOccupancy(occAt);
+    const int fox = field_->ox;
+    auto rowAt = [&](int y, uint8_t * out) {   // tight byte loop: vectorisable, no per-cell lambda calls
+        const unsigned char * src = m + static_cast<size_t>(y - oyc) * nx + static_cast<size_t>(fox - oxc);
+        const int n = field_->Nx;
+        if (unk) {
+          for (int i = 0; i < n; ++i) {out[i] = (src[i] >= lethal || src[i] == nav2_costmap_2d::NO_INFORMATION) ? 1 : 0;}
+        } else {
+          for (int i = 0; i < n; ++i) {out[i] = (src[i] != nav2_costmap_2d::NO_INFORMATION && src[i] >= lethal) ? 1 : 0;}
+        }
+      };
+    t.changed = field_->syncOccupancyRows(rowAt);
     t.diff_us = usSince(t1);
     // (c) waves
     auto t2 = Clock::now();

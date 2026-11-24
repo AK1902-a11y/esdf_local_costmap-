@@ -78,7 +78,11 @@ static Stats run(int Nx, int Ny, float dmax_cells, bool dynamic, int steps, unsi
       }
     }
     f.shift(ox, oy, occ);
-    f.syncOccupancy(occ);
+    if (s % 2) {   // exercise both scan variants (the layer uses the row version)
+      f.syncOccupancyRows([&](int y, uint8_t * out) {for (int i = 0; i < Nx; ++i) {out[i] = w.at(f.ox + i, y) ? 1 : 0;}});
+    } else {
+      f.syncOccupancy(occ);
+    }
     f.update();
     if (f.last_full_rebuild) {++st.rebuilds;}
     brute(w, ox, oy, Nx, Ny, f.dmax2, ref);
